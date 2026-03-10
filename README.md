@@ -1,1 +1,181 @@
-# adaptive-engine
+# Adaptive Diagnostic Engine
+
+A 1D Adaptive Diagnostic Engine that delivers personalized GRE-style assessments using Item Response Theory (IRT) and generates AI-powered study plans via OpenAI.
+
+## Tech Stack
+
+- **Backend:** Flask
+- **Database:** MongoDB Atlas
+- **AI:** OpenAI GPT-4o-mini (with rule-based fallback)
+- **Algorithm:** 2PL Item Response Theory (IRT)
+
+## Project Structure
+
+```
+adaptive-engine/
+├── app.py          # Flask routes and API endpoints
+├── db.py           # MongoDB connection
+├── irt.py          # IRT adaptive algorithm
+├── study_plan.py   # OpenAI study plan generation
+├── seed.py         # 20 GRE-style seed questions
+├── .env            # Environment variables (not committed)
+├── requirements.txt
+└── README.md
+```
+
+## Setup
+
+### 1. Clone and install dependencies
+
+```bash
+git clone <repo-url>
+cd adaptive-engine
+pip install flask pymongo openai python-dotenv
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/adaptive_engine
+OPENAI_API_KEY=sk-...
+```
+
+### 3. Seed the database
+
+```bash
+python seed.py
+```
+
+### 4. Run the server
+
+```bash
+python app.py
+```
+
+Server runs at `http://127.0.0.1:5000`
+
+---
+
+## API Endpoints
+
+### `POST /session/start`
+Start a new diagnostic session.
+
+**Request:**
+```json
+{ "user_id": "user123" }
+```
+
+**Response:**
+```json
+{
+  "session_id": "uuid",
+  "question": { "question_id": "q002", "text": "...", "options": [...], "topic": "vocabulary" },
+  "question_number": 1,
+  "total_questions": 10
+}
+```
+
+---
+
+### `POST /session/answer`
+Submit an answer and receive the next adaptive question.
+
+**Request:**
+```json
+{
+  "session_id": "uuid",
+  "question_id": "q002",
+  "answer": "C"
+}
+```
+
+**Response:**
+```json
+{
+  "correct": true,
+  "correct_answer": "C",
+  "theta": 0.88,
+  "completed": false,
+  "next_question": { ... },
+  "question_number": 2,
+  "total_questions": 10
+}
+```
+
+---
+
+### `GET /session/result?session_id=<id>`
+Get session summary with score and topic breakdown.
+
+**Response:**
+```json
+{
+  "session_id": "uuid",
+  "theta": 4.0,
+  "score": "10/10",
+  "accuracy": 100.0,
+  "topic_breakdown": {
+    "vocabulary": { "correct": 5, "total": 5 },
+    "quantitative": { "correct": 3, "total": 3 },
+    "analytical": { "correct": 2, "total": 2 }
+  }
+}
+```
+
+---
+
+### `POST /session/plan`
+Generate a personalized study plan for a completed session.
+
+**Request:**
+```json
+{ "session_id": "uuid" }
+```
+
+**Response:**
+```json
+{
+  "session_id": "uuid",
+  "study_plan": "## Personalized GRE Study Plan\n..."
+}
+```
+
+> **Note:** Requires a funded OpenAI API key in `.env`. If unavailable, a rule-based study plan is returned automatically based on the user's performance data.
+
+---
+
+## How It Works
+
+### Adaptive Algorithm (IRT)
+
+The engine uses a **2-Parameter Logistic (2PL) IRT model**:
+
+- Each question has two parameters:
+  - `irt_b` — difficulty (range: -2 to +2)
+  - `irt_a` — discrimination (how well the question differentiates ability levels)
+- The user's ability `theta` starts at 0 (average) and updates after each answer
+- The next question is always selected as the one whose difficulty (`irt_b`) is closest to the current `theta`
+- This ensures the test is always appropriately challenging — not too easy, not too hard
+
+### Study Plan Generation
+
+After completing 10 questions, the `/session/plan` endpoint:
+1. Computes per-topic accuracy from session responses
+2. Sends performance data to OpenAI GPT-4o-mini with a structured prompt
+3. Returns a personalized 7-day study plan
+4. Falls back to a rule-based plan if OpenAI is unavailable
+
+---
+
+## Questions Dataset
+
+20 GRE-style questions across 3 topics:
+
+| Topic | Count | Difficulty Range |
+|-------|-------|-----------------|
+| Vocabulary | 8 | -0.5 to 1.2 |
+| Quantitative | 7 | -1.0 to 1.0 |
+| Analytical | 5 | -0.3 to 0.9 |# adaptive-engine
