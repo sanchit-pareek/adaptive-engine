@@ -174,15 +174,11 @@ After completing 10 questions, the `/session/plan` endpoint:
 Used Claude (Anthropic) as the primary development assistant throughout this project.
 
 **What AI helped with:**
-- MongoDB schema design and collection structure
 - IRT algorithm implementation (2PL model, theta update via gradient ascent, question selection logic)
 - Flask route structure and session management
 - OpenAI prompt engineering for the study plan generator
-- Debugging (PowerShell curl encoding issues, pycache gitignore)
+- Debugging (PowerShell curl encoding issues)
 
-**What AI couldn't solve:**
-- OpenAI quota error due to a free-tier API key with no billing — had to implement a rule-based fallback manually
-- GitHub authentication conflict between two accounts required manual remote URL fix
 ## Questions Dataset
 
 20 GRE-style questions across 3 topics:
@@ -193,3 +189,4 @@ Used Claude (Anthropic) as the primary development assistant throughout this pro
 | Quantitative | 7 | -1.0 to 1.0 |
 
 | Analytical | 5 | -0.3 to 0.9 |
+
