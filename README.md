@@ -169,6 +169,15 @@ After completing 10 questions, the `/session/plan` endpoint:
 4. Falls back to a rule-based plan if OpenAI is unavailable
 
 ---
+## AI Log
+
+Used Claude (Anthropic) as the primary development assistant throughout this project.
+
+**What AI helped with:**
+- IRT algorithm implementation (2PL model, theta update via gradient ascent, question selection logic)
+- Flask route structure and session management
+- OpenAI prompt engineering for the study plan generator
+- Debugging (PowerShell curl encoding issues)
 
 ## Questions Dataset
 
