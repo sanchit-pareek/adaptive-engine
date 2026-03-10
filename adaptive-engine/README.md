@@ -169,7 +169,20 @@ After completing 10 questions, the `/session/plan` endpoint:
 4. Falls back to a rule-based plan if OpenAI is unavailable
 
 ---
+## AI Log
 
+Used Claude (Anthropic) as the primary development assistant throughout this project.
+
+**What AI helped with:**
+- MongoDB schema design and collection structure
+- IRT algorithm implementation (2PL model, theta update via gradient ascent, question selection logic)
+- Flask route structure and session management
+- OpenAI prompt engineering for the study plan generator
+- Debugging (PowerShell curl encoding issues, pycache gitignore)
+
+**What AI couldn't solve:**
+- OpenAI quota error due to a free-tier API key with no billing — had to implement a rule-based fallback manually
+- GitHub authentication conflict between two accounts required manual remote URL fix
 ## Questions Dataset
 
 20 GRE-style questions across 3 topics:
@@ -178,4 +191,5 @@ After completing 10 questions, the `/session/plan` endpoint:
 |-------|-------|-----------------|
 | Vocabulary | 8 | -0.5 to 1.2 |
 | Quantitative | 7 | -1.0 to 1.0 |
+
 | Analytical | 5 | -0.3 to 0.9 |
